@@ -1,0 +1,26 @@
+# build
+build/
+bin/
+out/
+cmake-build-debug/
+cmake-build-release/
+
+# Cache archives
+CMakeCache.txt
+CMakeFiles/
+
+# binary
+*.exe
+*.dll
+*.so
+*.o
+*.obj
+
+# Temporary stuff
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+.idea/
+
