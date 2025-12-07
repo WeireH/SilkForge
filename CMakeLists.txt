@@ -4,7 +4,7 @@ project(SilkForge)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 17)
 
-# Pasta das suas dependências locais (GLAD)
+# dependências locais (GLAD)
 include_directories(${PROJECT_SOURCE_DIR}/dependencies/include)
 
 # Inclui GLFW do Homebrew

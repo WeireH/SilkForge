@@ -6,23 +6,48 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+// vertex shader configs
+const char *vertexShaderSource = 
+"#version 330 core\n"
+
+"layout (location = 0) in vec3 aPos;\n"
+
+"void main()\n"
+"{\n"
+"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"}\0";
+
+
+//fragment shader configs
+const char *fragmentShaderSource =
+"#version 330 core\n"
+
+"out vec4 FragColor;\n"
+
+"void main()\n"
+"{\n"
+"    FragColor = vec4(1.0, 0.5, 0.2, 1.0);\n"
+"}\n";
+
+
+
 int main() {
     if (!glfwInit()) {
         std::cout << "Erro ao iniciar GLFW\n";
         return -1;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
-    GLFWwindow * window = glfwCreateWindow(800, 600, "SilkForge", nullptr, nullptr);
-    if (!window) {
-        std::cout << "Erro ao criar janela\n";
-        glfwTerminate();
-        return -1;
+        GLFWwindow * window = glfwCreateWindow(800, 600, "SilkForge", nullptr, nullptr);
+        if (!window) {
+            std::cout << "Erro ao criar janela\n";
+            glfwTerminate();
+            return -1;
     }
 
     glfwMakeContextCurrent(window);
@@ -31,6 +56,44 @@ int main() {
         std::cout << "Erro ao iniciar GLAD\n";
         return -1;
     }
+
+
+    // compiling the vertex shader
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+
+
+    // compiling the fragment shader (color of the pixels)
+    unsigned int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    // linking the shaders in a shader program
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+
+    // using the shader program, every shader and rendering action will use the shaderProgram from now on
+    glUseProgram(shaderProgram);
+    
+    // this is quite useless now lol
+    glDeleteShader(fragmentShader);
+    glDeleteShader(vertexShader);
+
+
+    // telling openGL how to interpret the data in the VBO
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -41,13 +104,14 @@ int main() {
         0, 0.5, 0
     };
 
+    // defining VBO buffer
     unsigned int VBO;
     glGenBuffers(1, &VBO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_DYNAMIC_DRAW);
 
-
+    // main loop of the app
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -56,6 +120,7 @@ int main() {
         glfwPollEvents();
     }
 
+    // close window
     glfwTerminate();
     return 0;
 }
