@@ -19,7 +19,7 @@ set(SOURCES
 
 add_executable(SilkForge ${SOURCES})
 
-# Linkar GLFW e OpenGL no macOS
+# Linkar GLFW e OpenGL
 target_link_libraries(SilkForge 
     glfw
     "-framework Cocoa"
