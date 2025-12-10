@@ -2,37 +2,37 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
     glViewport(0, 0, width, height);
 }
 
 // vertex shader configs
-const char *vertexShaderSource = 
-"#version 330 core\n"
+const char *vertexShaderSource =
+    "#version 330 core\n"
 
-"layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 0) in vec3 aPos;\n"
 
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
 
-
-//fragment shader configs
+// fragment shader configs
 const char *fragmentShaderSource =
-"#version 330 core\n"
+    "#version 330 core\n"
 
-"out vec4 FragColor;\n"
+    "out vec4 FragColor;\n"
 
-"void main()\n"
-"{\n"
-"    FragColor = vec4(1.0, 0.5, 0.2, 1.0);\n"
-"}\n";
+    "void main()\n"
+    "{\n"
+    "    FragColor = vec4(1.0, 0.5, 0.2, 1.0);\n"
+    "}\n";
 
-
-
-int main() {
-    if (!glfwInit()) {
+int main()
+{
+    if (!glfwInit())
+    {
         std::cout << "Erro ao iniciar GLFW\n";
         return -1;
     }
@@ -45,9 +45,10 @@ int main() {
 
     glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
-    GLFWwindow * window = glfwCreateWindow(800, 600, "SilkForge", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(800, 600, "SilkForge", nullptr, nullptr);
 
-    if (!window) {
+    if (!window)
+    {
         std::cout << "Erro ao criar janela\n";
         glfwTerminate();
         return -1;
@@ -55,7 +56,8 @@ int main() {
 
     glfwMakeContextCurrent(window);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
         std::cout << "Erro ao iniciar GLAD\n";
         return -1;
     }
@@ -63,8 +65,6 @@ int main() {
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
-
-
 
     // compiling the vertex shader
     unsigned int vertexShader;
@@ -77,12 +77,13 @@ int main() {
         int success;
         char infoLog[512];
         glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        if (!success) {
+        if (!success)
+        {
             glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
+                      << infoLog << std::endl;
         }
     }
-
 
     // compiling the fragment shader (color of the pixels)
     unsigned int fragmentShader;
@@ -95,9 +96,11 @@ int main() {
         int success;
         char infoLog[512];
         glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-        if (!success) {
+        if (!success)
+        {
             glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
+                      << infoLog << std::endl;
         }
     }
 
@@ -113,29 +116,37 @@ int main() {
         int success;
         char infoLog[512];
         glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-        if (!success) {
+        if (!success)
+        {
             glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
+                      << infoLog << std::endl;
         }
     }
 
-
     // using the shader program, every shader and rendering action will use the shaderProgram from now on
     glUseProgram(shaderProgram);
-    
+
     // this is quite useless now lol
     glDeleteShader(fragmentShader);
     glDeleteShader(vertexShader);
 
-
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    float triangleVertices[] {
-     // x    y   z
-        -0.1, -0.1, 0,
-        0.1, -0.1, 0,
-        0, 0.1, 0
+    float triangleVertices[]{
+        // x y z
+        0.5f, 0.5f, 0.0f, // top right
+        0.5f, -0.5f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f, 0.5f, 0.0f // top left
     };
+
+    // indices for the ebo
+    unsigned int indices[] = {
+        0, 1, 3,
+        1, 2, 3
+    };
+
     // creating VAO
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
@@ -145,29 +156,32 @@ int main() {
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_DYNAMIC_DRAW);
 
     // configure vertex attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
-    
-
+    // defining an EBO
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
 
     // main loop of the app
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window))
+    {
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // render our triangle
+        // render the triangle
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
         glfwPollEvents();
-
     }
 
     // close window

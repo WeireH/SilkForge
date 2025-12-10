@@ -27,3 +27,4 @@ target_link_libraries(SilkForge
     "-framework IOKit"
     "-framework CoreVideo"
 )
+
